@@ -1,12 +1,17 @@
 package com.daanooo.yeelightutils.discovery;
 
+import com.daanooo.yeelightutils.device.YeelightDevice;
+
 import java.io.IOException;
 import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SsdpDiscovery implements Runnable {
     private final String hostName;
     private final int port;
     private final int timeout;
+    private volatile Map<String, YeelightDevice> devices = new HashMap<>();
 
     public SsdpDiscovery(String hostName, int port, int timeout) {
         this.hostName = hostName;
@@ -42,14 +47,20 @@ public class SsdpDiscovery implements Runnable {
 
             while (!Thread.currentThread().isInterrupted()) {
                 socket.receive(receivingPacket);
-                System.out.println(new String(responseBytes));
+
+                YeelightDevice device = YeelightDevice.fromMessage(new String(responseBytes));
+                this.devices.put(device.getLocation(), device);
+
                 receivingPacket.setLength(1024);
             }
         } catch (SocketTimeoutException e) {
-            System.out.println("Timeout reached, stopping discovery");
             Thread.currentThread().interrupt();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Map<String, YeelightDevice> getDevices() {
+        return this.devices;
     }
 }
