@@ -23,6 +23,14 @@ public class SsdpDiscovery implements Runnable {
         this(hostName, port, 5000);
     }
 
+    public Map<String, YeelightDevice> doDiscovery() throws InterruptedException {
+        Thread thread = new Thread(this);
+        thread.start();
+        thread.join();
+
+        return this.devices;
+    }
+
     @Override
     public void run() {
         try (DatagramSocket socket = new DatagramSocket()) {
@@ -48,6 +56,7 @@ public class SsdpDiscovery implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 socket.receive(receivingPacket);
 
+                // TODO write devices to a file or DB here so the thread is fully independent
                 YeelightDevice device = YeelightDevice.fromMessage(new String(responseBytes));
                 this.devices.put(device.getLocation(), device);
 
