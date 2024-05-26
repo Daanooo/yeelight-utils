@@ -23,7 +23,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.daanooo.YeelightUtils</mainClass>
+                            <mainClass>com.daanooo.yeelightutils.YeelightUtils</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
